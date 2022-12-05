@@ -114,7 +114,10 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         }
     }
     public function index() {
-        $this->view->data = $this->_getProjectsByStatus();
+        $this->view->data = [
+            'projects' => $this->_getProjectsByStatus(),
+            'configs' => $this->_getConfigurations()
+        ];
     }
     
     public function runCli(array $params) {
@@ -128,5 +131,20 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             ->where('lca_id IN (?)', implode(',', self::$_projectsWorkflowIds));
         $res = $db->fetchAll($select);
         return array_column($res, 'id_record');
+    }
+    private function _getConfigurations(): array {
+        $db = Zend_Registry::getInstance()->dbAdapter;
+        $select = $db->select()
+            ->from(
+                'k_record_'.self::$_configurationLibraryId, 
+                [
+                    'id_record',
+                    'dateAttribute' => self::$_configurationDateAttributeId,
+                    'doneAttribute' => self::$_configurationDoneAttributeId,
+                    'delay' => self::$_configurationDelayAttributeId
+                ]
+            );
+        $res = $db->fetchAll($select);
+        return $res;
     }
 }
