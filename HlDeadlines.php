@@ -115,9 +115,13 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     }
     public function index() {
         try {
+            $projects = $this->_getProjectsByStatus();
+            $configs = $this->_getConfigurations();
+            $projectsWithValues = $this->_retrieveProjectsValues($projects, $configs);
             $this->view->data = [
-                'projects' => $this->_getProjectsByStatus(),
-                'configs' => $this->_getConfigurations()
+                'projects' => $projects,
+                'configs' => $configs,
+                'projectsWithValues' => $projectsWithValues
             ];
         } catch (Exception $e) {
             $this->view->data = [
@@ -125,7 +129,6 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                 'stack' => $e->getTraceAsString()
             ];
         }
-        
     }
     
     public function runCli(array $params) {
@@ -156,5 +159,24 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             ->where('lca_id IS NULL');
         $res = $db->fetchAll($select);
         return $res;
+    }
+    private function _retrieveProjectsValues(array $projects, array $configs): array {
+        foreach ($projects as $keyProject => $project) {
+            $projects[$keyProject]['values'] = [];
+            foreach ($configs as $config) {
+                $dateValue = $this->_getDateValue((int)$project['id_record'], (int)$config['dateAttribute']);
+                $projects[$keyProject]['values'][(int)$config['dateAttribute']] = $dateValue;
+            }
+        }
+        return $projects;
+    }
+    private function _getDateValue(int $idProject, int $idAttribute):string {
+        if ($idProject === 0 || $idAttribute === 0) {
+            return '';
+        }
+        $values = Kbx_Attributes::getValue($idProject, Kbx_Libraries::$projectsLibraryId, $idProject, $idAttribute);
+        return sizeof($values)>0
+            ? $values[0]['value']
+            : '';
     }
 }
