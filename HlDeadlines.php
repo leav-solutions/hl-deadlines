@@ -151,7 +151,9 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                     'doneAttribute' => 'attribute_'.self::$_configurationDoneAttributeId,
                     'delay' => 'attribute_'.self::$_configurationDelayAttributeId
                 ]
-            );
+            )
+            ->where('attribute_'.self::$_configurationDateAttributeId.' IS NOT NULL')
+            ->where('lca_id IS NULL');
         $res = $db->fetchAll($select);
         return $res;
     }
