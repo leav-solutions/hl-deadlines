@@ -170,7 +170,6 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                 foreach ($configs as $config) {
                     $projectData['values'][(int)$config['dateAttribute']] = $this->_getValue((int)$projectId, (int)$config['dateAttribute']);
                     $projectData['values'][(int)$config['doneAttribute']] = (int)$this->_getValue((int)$projectId, (int)$config['doneAttribute']);
-                    $projectData['values'][(int)$config['delay']] = (int)$this->_getValue((int)$projectId, (int)$config['delay']);
                 }
                 return $projectData;
             },
