@@ -4,3 +4,13 @@ Content of HL Deadlines plugin
     print_r($this->data);
     ?>
 </pre>
+<script type="text/javascript">
+$('#<?= $this->dialogId ?>').dialog('option','buttons',{
+    "Close" : function(){
+        $('#<?= $this->dialogId?>').dialog('destroy');
+    },
+    "Refresh" : function(){
+        openDialog('/plugin/index/plugin/HlDeadlines',500,300,{execute : 'index'}, '', false, '<?= $this->dialogId?>');
+    }
+}).dialog('option','position','center');
+</script>
