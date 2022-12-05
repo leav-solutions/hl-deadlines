@@ -161,14 +161,20 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         return $res;
     }
     private function _retrieveProjectsValues(array $projects, array $configs): array {
-        foreach ($projects as $keyProject => $project) {
-            $projects[$keyProject]['values'] = [];
-            foreach ($configs as $config) {
-                $dateValue = $this->_getDateValue((int)$project['id_record'], (int)$config['dateAttribute']);
-                $projects[$keyProject]['values'][(int)$config['dateAttribute']] = $dateValue;
-            }
-        }
-        return $projects;
+        return array_map(
+            function ($projectId) use ($configs) {
+                $projectData = [
+                    'id_record' => $projectId,
+                    'values' => []
+                ];
+                foreach ($configs as $config) {
+                    $dateValue = $this->_getDateValue((int)$projectId, (int)$config['dateAttribute']);
+                    $projectData['values'][(int)$config['dateAttribute']] = $dateValue;
+                }
+                return $projectData;
+            },
+            $projects
+        );
     }
     private function _getDateValue(int $idProject, int $idAttribute):string {
         if ($idProject === 0 || $idAttribute === 0) {
