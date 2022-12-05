@@ -3,6 +3,39 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     protected static $_runAsUser = 1;
 
     /**
+     * @var int
+     */
+    protected static $_configurationLibraryId = 110;
+    /**
+     * @var int
+     */
+    protected static $_configurationDateAttributeId = 869;
+    /**
+     * @var int
+     */
+    protected static $_configurationDoneAttributeId = 868;
+    /**
+     * @var int
+     */
+    protected static $_configurationDelayAttributeId = 873;
+    /**
+     * @var int
+     */
+    protected static $_configurationTitleAttributeId = 871;
+    /**
+     * @var int
+     */
+    protected static $_configurationBodyAttributeId = 872;
+    /**
+     * @var int
+     */
+    protected static $_configurationRecipientsAttributeId = 870;
+    /**
+     * @var array
+     */
+    protected static $_projectsWorkflowIds = [43];
+
+    /**
      * @var string|bool
      */
     protected $layout;
@@ -81,10 +114,19 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         }
     }
     public function index() {
-        
+        $this->view->data = $this->_getProjectsByStatus();
     }
     
     public function runCli(array $params) {
         
+    }
+
+    private function _getProjectsByStatus(): array {
+        $db = Zend_Registry::getInstance()->dbAdapter;
+        $select = $db->select()
+            ->from('k_record_4', ['id_record'])
+            ->where('lca_id IN (?)', implode(',', self::$_projectsWorkflowIds));
+        $res = $db->fetchAll($select);
+        return array_column($res, 'id_record');
     }
 }
