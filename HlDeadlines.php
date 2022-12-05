@@ -114,10 +114,18 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         }
     }
     public function index() {
-        $this->view->data = [
-            'projects' => $this->_getProjectsByStatus(),
-            'configs' => $this->_getConfigurations()
-        ];
+        try {
+            $this->view->data = [
+                'projects' => $this->_getProjectsByStatus(),
+                'configs' => $this->_getConfigurations()
+            ];
+        } catch (Exception $e) {
+            $this->view->data = [
+                'message' => $e->getMessage(),
+                'stack' => $e->getTraceAsString()
+            ];
+        }
+        
     }
     
     public function runCli(array $params) {
@@ -139,9 +147,9 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                 'k_record_'.self::$_configurationLibraryId, 
                 [
                     'id_record',
-                    'dateAttribute' => self::$_configurationDateAttributeId,
-                    'doneAttribute' => self::$_configurationDoneAttributeId,
-                    'delay' => self::$_configurationDelayAttributeId
+                    'dateAttribute' => 'attribute_'.self::$_configurationDateAttributeId,
+                    'doneAttribute' => 'attribute_'.self::$_configurationDoneAttributeId,
+                    'delay' => 'attribute_'.self::$_configurationDelayAttributeId
                 ]
             );
         $res = $db->fetchAll($select);
