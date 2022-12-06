@@ -214,7 +214,6 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     private function _groupProjectsByDeadline(array $projectsWithValues, array $configs): array {
         $configsWithProjects = array_map(
             function ($config) use ($projectsWithValues) {
-                
                 $config['matchingProjects'] = [];
                 foreach ($projectsWithValues as $project) {
                     // check the done value
@@ -234,7 +233,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             },
             $configs
         );
-        return [];
+        return $configsWithProjects;
     }
     private function _dateStringToTimestamp(string $dateStr): int {
         if ((string)intval($dateStr) === $dateStr) {
