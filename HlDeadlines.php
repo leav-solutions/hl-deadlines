@@ -168,7 +168,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                     'values' => []
                 ];
                 foreach ($configs as $config) {
-                    $projectData['values'][(int)$config['dateAttribute']] = $this->_getValue((int)$projectId, (int)$config['dateAttribute']);
+                    $projectData['values'][(int)$config['dateAttribute']] = $this->_getValue((int)$projectId, (int)$config['dateAttribute'], true);
                     $projectData['values'][(int)$config['doneAttribute']] = (int)$this->_getValue((int)$projectId, (int)$config['doneAttribute']);
                     $projectData['values'][(int)$config['dateAttribute'].'_timestamp'] = $this->_dateStringToTimestamp($projectData['values'][(int)$config['dateAttribute']]);
 
@@ -178,13 +178,15 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             $projects
         );
     }
-    private function _getValue(int $idProject, int $idAttribute):string {
+    private function _getValue(int $idProject, int $idAttribute, bool $raw = false):string {
         if ($idProject === 0 || $idAttribute === 0) {
             return '';
         }
         $values = Kbx_Attributes::getValue($idProject, Kbx_Libraries::$projectsLibraryId, $idProject, $idAttribute);
         return sizeof($values)>0
-            ? $values[0]['value']
+            ? $raw && isset($values[0]['raw_value'])
+                ? $values[0]['raw_value']
+                : $values[0]['value']
             : '';
     }
     private function _groupProjectsByDeadline(array $projectsWithValues, array $configs): array {
