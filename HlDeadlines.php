@@ -54,6 +54,14 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
      * @var array
      */
     protected $params;
+    /**
+     * @var array
+     */
+    protected $_dateFormats;
+    /**
+     * @var string
+     */
+    protected $_lang;
     // phpcs:ignore Zend.NamingConventions.ValidVariableName
     /**
      * @var string
@@ -68,6 +76,9 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             $params['execute'] = 'index';
         }
         $this->viewRenderer = $params['execute'];
+
+        $this->_dateFormats = Zend_Registry::getInstance()->dateFormats;
+        $this->_lang = Zend_Registry::getInstance()->Zend_Locale->getLanguage();
 
     }
     public function getViewsPath(): string {
@@ -158,7 +169,18 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             ->where('attribute_'.self::$_configurationDateAttributeId.' IS NOT NULL')
             ->where('lca_id IS NULL');
         $res = $db->fetchAll($select);
-        return $res;
+        $configs = array_map(
+            function($config) {
+                $configDateLimit = new DateTime();
+                $delayStr = '-'.(abs((int)$config['delay']));
+                $configDateLimit->modify("$delayStr day");
+                $configDateLimit->setTime(0, 0, 0);
+                $config['limitTimestamp'] = $configDateLimit->getTimestamp();
+                return $config;
+            },
+            $res
+        );
+        return $configs;
     }
     private function _retrieveProjectsValues(array $projects, array $configs): array {
         return array_map(
@@ -190,6 +212,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     private function _groupProjectsByDeadline(array $projectsWithValues, array $configs): array {
         $configsWithProjects = array_map(
             function ($config) use ($projectsWithValues) {
+                
                 $config['matchingProjects'] = [];
                 foreach ($projectsWithValues as $project) {
                     // check the done value
@@ -213,9 +236,8 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             $parsed->setTimestamp($dateStr);
 
         } else {
-            $dateFormats = Zend_Registry::getInstance()->dateFormats;
-            $lang = Zend_Registry::getInstance()->Zend_Locale->getLanguage();
-            $parsed = Kbx_Dates::date_create_from_format($dateFormats[$lang]['php'], $dateStr);
+            
+            $parsed = Kbx_Dates::date_create_from_format($this->_dateFormats[$this->_lang]['php'], $dateStr);
         }
         $parsed->setTime(0,0,0);
         return $parsed->getTimestamp();
