@@ -170,6 +170,8 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                 foreach ($configs as $config) {
                     $projectData['values'][(int)$config['dateAttribute']] = $this->_getValue((int)$projectId, (int)$config['dateAttribute']);
                     $projectData['values'][(int)$config['doneAttribute']] = (int)$this->_getValue((int)$projectId, (int)$config['doneAttribute']);
+                    $projectData['values'][(int)$config['dateAttribute'].'_timestamp'] = $this->_dateStringToTimestamp($projectData['values'][(int)$config['dateAttribute']]);
+
                 }
                 return $projectData;
             },
@@ -184,5 +186,30 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         return sizeof($values)>0
             ? $values[0]['value']
             : '';
+    }
+    private function _groupProjectsByDeadline(array $projectsWithValues, array $configs): array {
+        $configsWithProjects = array_map(
+            function ($config) use ($projectsWithValues) {
+                $config['matchingProjects'] = [];
+                foreach ($projectsWithValues as $project) {
+                    // check the done value
+                    if ($project['values'][(int)$config['doneAttribute']] == 1) {
+                        // ignore this project cause marked as done for this config
+                        continue;
+                    }
+                    // check date value against current date - delay
+                }
+
+                return $config;
+            },
+            $configs
+        );
+        return [];
+    }
+    private function _dateStringToTimestamp(string $dateStr): int {
+        $dateFormats = Zend_Registry::getInstance()->dateFormats;
+        $lang = Zend_Registry::getInstance()->Zend_Locale->getLanguage();
+        $parsed = Kbx_Dates::date_create_from_format($dateFormats[$lang]['php'], $dateStr);
+        return $parsed->getTimestamp();
     }
 }
