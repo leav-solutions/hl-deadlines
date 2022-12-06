@@ -211,14 +211,13 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             // we recieved a timestamp, no need to convert, but set to 00h:00m:00s
             $parsed = new DateTime();
             $parsed->setTimestamp($dateStr);
-            $parsed->setTime(0,0,0);
 
         } else {
             $dateFormats = Zend_Registry::getInstance()->dateFormats;
             $lang = Zend_Registry::getInstance()->Zend_Locale->getLanguage();
             $parsed = Kbx_Dates::date_create_from_format($dateFormats[$lang]['php'], $dateStr);
         }
-
+        $parsed->setTime(0,0,0);
         return $parsed->getTimestamp();
     }
 }
