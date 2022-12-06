@@ -129,10 +129,12 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             $projects = $this->_getProjectsByStatus();
             $configs = $this->_getConfigurations();
             $projectsWithValues = $this->_retrieveProjectsValues($projects, $configs);
+            $configsWithProjects = $this->_groupProjectsByDeadline($projectsWithValues, $configs);
             $this->view->data = [
                 'projects' => $projects,
                 'configs' => $configs,
-                'projectsWithValues' => $projectsWithValues
+                'projectsWithValues' => $projectsWithValues,
+                'configWithProjects' => $configsWithProjects
             ];
         } catch (Exception $e) {
             $this->view->data = [
@@ -220,7 +222,12 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                         // ignore this project cause marked as done for this config
                         continue;
                     }
-                    // check date value against current date - delay
+                    if ($project['values'][(int)$config['dateAttribute'].'_timestamp'] <= $config['limitTimestamp']) {
+                        $config['matchingProjects'][] = [
+                            'id_record' => $project['id_record'],
+                            'timestamp' => $project['values'][(int)$config['dateAttribute'].'_timestamp']
+                        ];
+                    }
                 }
 
                 return $config;
