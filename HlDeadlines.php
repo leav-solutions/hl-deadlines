@@ -130,11 +130,13 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             $configs = $this->_getConfigurations();
             $projectsWithValues = $this->_retrieveProjectsValues($projects, $configs);
             $configsWithProjects = $this->_groupProjectsByDeadline($projectsWithValues, $configs);
+            $configsWithProjectsAndNotifications = $this->_generateNotificationsTexts($configsWithProjects);
             $this->view->data = [
                 'projects' => $projects,
                 'configs' => $configs,
                 'projectsWithValues' => $projectsWithValues,
-                'configWithProjects' => $configsWithProjects
+                'configWithProjects' => $configsWithProjects,
+                'configsWithProjectsAndNotifications' => $configsWithProjectsAndNotifications
             ];
         } catch (Exception $e) {
             $this->view->data = [
@@ -192,21 +194,30 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                     'values' => []
                 ];
                 foreach ($configs as $config) {
-                    $projectData['values'][(int)$config['dateAttribute']] = $this->_getValue((int)$projectId, (int)$config['dateAttribute']);
-                    $projectData['values'][(int)$config['doneAttribute']] = (int)$this->_getValue((int)$projectId, (int)$config['doneAttribute']);
+                    $projectData['values'][(int)$config['dateAttribute']] = $this->_getValue(
+                        (int)$projectId, 
+                        Kbx_Libraries::$projectsLibraryId, 
+                        (int)$config['dateAttribute'],
+                        (int)$projectId
+                    );
+                    $projectData['values'][(int)$config['doneAttribute']] = (int)$this->_getValue(
+                        (int)$projectId, 
+                        Kbx_Libraries::$projectsLibraryId, 
+                        (int)$config['doneAttribute'],
+                        (int)$projectId
+                    );
                     $projectData['values'][(int)$config['dateAttribute'].'_timestamp'] = $this->_dateStringToTimestamp($projectData['values'][(int)$config['dateAttribute']]);
-
                 }
                 return $projectData;
             },
             $projects
         );
     }
-    private function _getValue(int $idProject, int $idAttribute):string {
-        if ($idProject === 0 || $idAttribute === 0) {
+    private function _getValue(int $idRecord, int $idLibrary, int $idAttribute, int $idProject = 0):string {
+        if ($idRecord === 0 || $idlibrary === 0 || $idAttribute === 0) {
             return '';
         }
-        $values = Kbx_Attributes::getValue($idProject, Kbx_Libraries::$projectsLibraryId, $idProject, $idAttribute);
+        $values = Kbx_Attributes::getValue($idProject, $idLibrary, $idRecord, $idAttribute);
         return sizeof($values)>0
             ? $values[0]['value']
             : '';
@@ -247,5 +258,14 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         }
         $parsed->setTime(0,0,0);
         return $parsed->getTimestamp();
+    }
+    private function _generateNotificationsTexts(array $configsWithProjects): array {
+        return array_map(
+            function($config) {
+                //$configTitle = 
+                return $config;
+            },
+            $configsWithProjects
+        );
     }
 }
