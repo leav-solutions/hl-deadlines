@@ -12,5 +12,7 @@ $('#<?= $this->dialogId ?>').dialog('option','buttons',{
     "Refresh" : function(){
         openDialog('/plugin/index/plugin/HlDeadlines',500,300,{execute : 'index'}, '', false, '<?= $this->dialogId?>');
     }
-}).dialog('option','position','center');
+}).dialog('option', 'width', 600)
+.dialog('option', 'height', 600)
+.dialog('option','position','center');
 </script>
