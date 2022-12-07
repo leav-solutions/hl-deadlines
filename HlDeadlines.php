@@ -33,7 +33,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     /**
      * @var array
      */
-    protected static $_projectsWorkflowIds = [43];//[63]
+    protected static $_projectsWorkflowIds = [63];//[43];
 
     /**
      * @var string|bool
