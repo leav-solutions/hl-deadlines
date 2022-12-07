@@ -262,7 +262,16 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     private function _generateNotificationsTexts(array $configsWithProjects): array {
         return array_map(
             function($config) {
-                //$configTitle = 
+                $config['title'] = $this->_getValue(
+                    $config['id_record'], 
+                    self::$_configurationLibraryId, 
+                    self::$_configurationTitleAttributeId
+                );
+                $config['body'] = $this->_getValue(
+                    $config['id_record'], 
+                    self::$_configurationLibraryId, 
+                    self::$_configurationBodyAttributeId
+                );
                 return $config;
             },
             $configsWithProjects
