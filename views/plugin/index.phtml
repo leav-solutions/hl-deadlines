@@ -6,7 +6,7 @@
     <li>No email will be sent</li>
     <li>You (<?= Kbx_Users::getLogin(Kbx_Users::getCurrentUserId()) ?>) will be the only recipient of notifications</li>
 </ul>
-<button class="bouton ui-corner-all" style="margin-top:1em;">
+<button class="bouton ui-corner-all" style="margin-top:1em;" onClick="openDialog('/plugin/index/plugin/HlDeadlines',500,300,{execute : 'runTest', test_mode: '1'}, '', false, '<?= $this->dialogId?>');">
     <span class="font_icon icon-arrow-right"/> RUN TEST MODE 1
 </button>
 </p>
@@ -16,7 +16,7 @@
 <ul style="list-style-type: disc;padding-left:3em;">
     <li>You (<?= Kbx_Users::getLogin(Kbx_Users::getCurrentUserId()) ?>) will be the only recipient of notifications / emails</li>
 </ul>
-<button class="bouton ui-corner-all" style="margin-top:1em;">
+<button class="bouton ui-corner-all" style="margin-top:1em;" onClick="openDialog('/plugin/index/plugin/HlDeadlines',500,300,{execute : 'runTest', test_mode: '2'}, '', false, '<?= $this->dialogId?>');">
     <span class="font_icon icon-arrow-right"/> RUN TEST MODE 2
 </button>
 </p>

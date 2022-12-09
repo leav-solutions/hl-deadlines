@@ -1,0 +1,27 @@
+<h4>RUN results <?php if ($this->test_mode > 0) { echo "TEST MODE ".$this->_test_mode; }?>:</h4>
+<div id="accordion_<?= $this->dialogId ?>">
+<?php foreach ($this->data as $keySection => $section) : ?>
+    <h3><?= $keySection ?></h3>
+    <div>
+        <pre>
+            <?php print_r($section); ?>
+        </pre>
+    </div>
+<?php endforeach; ?>
+</div>
+<script type="text/javascript">
+$('#<?= $this->dialogId ?>').dialog('option','buttons',{
+    "Close" : function(){
+        $('#<?= $this->dialogId?>').dialog('destroy');
+    },
+    "Back" : function(){
+        openDialog('/plugin/index/plugin/HlDeadlines',500,300,{execute : 'index'}, '', false, '<?= $this->dialogId?>');
+    },
+    "Rerun" : function(){
+        openDialog('/plugin/index/plugin/HlDeadlines',500,300,{execute : 'runTest', test_mode: '<?= $this->test_mode ?>'}, '', false, '<?= $this->dialogId?>');
+    }
+}).dialog('option', 'width', 600)
+.dialog('option', 'height', 600)
+.dialog('option','position','center');
+$('#accordion_<?= $this->dialogId ?>').accordion();
+</script>

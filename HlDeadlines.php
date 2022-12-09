@@ -142,9 +142,8 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         $this->view->projectsTestStatusId = self::$_projectsWorkflowTestId;
         $this->view->projectsTestStatusLabel = Kbx_Roles::getTranslationLabel(self::$_projectsWorkflowTestId);
     }
-    public function runTest() {
+    private function _run() {
         try {
-            $this->_test = 1;
             $projects = $this->_getProjectsByStatus();
             $configs = $this->_getConfigurations();
             $projectsWithValues = $this->_retrieveProjectsValues($projects, $configs);
@@ -167,6 +166,12 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                 'stack' => $e->getTraceAsString()
             ];
         }
+    }
+    public function runTest() {
+        $this->viewRenderer = "run";
+        $this->_test = (int)$this->params['test_mode'];
+        $this->view->test_mode = $this->_test;
+        $this->_run();
     }
     
     public function runCli(array $params) {
