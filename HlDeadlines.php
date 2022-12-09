@@ -131,6 +131,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             $projectsWithValues = $this->_retrieveProjectsValues($projects, $configs);
             $configsWithProjects = $this->_groupProjectsByDeadline($projectsWithValues, $configs);
             $configsWithProjectsAndNotifications = $this->_generateNotificationsTexts($configsWithProjects);
+            $configsWithProjectsAndNotificationsAndRecipients = $this->_addRecipients($configsWithProjectsAndNotifications);
             $this->view->data = [
                 'projects' => $projects,
                 'configs' => $configs,
@@ -214,7 +215,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         );
     }
     private function _getValue(int $idRecord, int $idLibrary, int $idAttribute, int $idProject = 0):string {
-        if ($idRecord === 0 || $idlibrary === 0 || $idAttribute === 0) {
+        if ($idRecord === 0 || $idLibrary === 0 || $idAttribute === 0) {
             return '';
         }
         $values = Kbx_Attributes::getValue($idProject, $idLibrary, $idRecord, $idAttribute);
@@ -291,6 +292,28 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                 return $config;
             },
             $configsWithProjects
+        );
+    }
+    private function _addRecipients(array $configs): array {
+        return array_map(
+            function($config) {
+                $recipientsValues = Kbx_Attributes::getValue(
+                    0, 
+                    self::$_configurationLibraryId, 
+                    $config['id_record'], 
+                    self::$_configurationRecipientsAttributeId
+                );
+                $config['recipients'] = [];
+                foreach ($recipientsValues as $recipientValue) {
+                    $mail = Kbx_Users::getLogin($recipientValue['value']);
+                    $recipients[] = [
+                        'id' => $recipientValue['value'],
+                        'mail' => $mail
+                    ];
+                }
+                return $config;
+            },
+            $configs
         );
     }
     private function _replacePlaceholders(string $text, string $projectLabel, string $projectDate, string $deadlineDate): string {
