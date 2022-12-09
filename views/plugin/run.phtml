@@ -23,5 +23,8 @@ $('#<?= $this->dialogId ?>').dialog('option','buttons',{
 }).dialog('option', 'width', 600)
 .dialog('option', 'height', 600)
 .dialog('option','position','center');
-$('#accordion_<?= $this->dialogId ?>').accordion();
+$('#accordion_<?= $this->dialogId ?>').accordion({
+    collapsible: true,
+    active: false
+});
 </script>
