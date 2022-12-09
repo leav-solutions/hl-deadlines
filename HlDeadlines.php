@@ -347,7 +347,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                     'important' => true,
                     'event' => [
                         'title' => $title,
-                        'element' => str_replace("\r", "\n", $body);
+                        'element' => str_replace("\r", "\n", $body)
                     ]
                 ], 
                 $user['id']
