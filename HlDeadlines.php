@@ -133,15 +133,13 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             $configsWithProjects = $this->_filterDeadlinesWithoutProject($configsWithProjects);
             $configsWithProjectsAndNotifications = $this->_generateNotificationsTexts($configsWithProjects);
             $configsWithProjectsAndNotificationsAndRecipients = $this->_addRecipients($configsWithProjectsAndNotifications);
-            $whoIsOnline = Kbx_RealTimeMessage::getConnectedUsers();
             $this->view->data = [
                 'projects' => $projects,
                 'configs' => $configs,
                 'projectsWithValues' => $projectsWithValues,
                 'configWithProjects' => $configsWithProjects,
                 'configsWithProjectsAndNotifications' => $configsWithProjectsAndNotifications,
-                'configsWithProjectsAndNotificationsAndRecipients' => $configsWithProjectsAndNotificationsAndRecipients,
-                'whoIsOnline' => $whoIsOnline
+                'configsWithProjectsAndNotificationsAndRecipients' => $configsWithProjectsAndNotificationsAndRecipients
             ];
         } catch (Exception $e) {
             $this->view->data = [
@@ -333,12 +331,28 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         foreach ($configs as $config) {
             foreach ($config['recipients'] as $recipient) {
                 foreach ($config['matchingProjects'] as $project) {
-
+                    $this->_sendNotification($whoIsOnline, $recipient, $project['title'], $project['body']);
                 }
             }
             
 
         }
+    }
+    private function _sendNotification(array $whoIsOnline, array $user, string $title, string $body) {
+        if (in_array((int)$user['id'], $whoIsOnline)) {
+            Kbx_RealTimeMessage::emit(
+                [
+                    'type' => 'notification',
+                    'important' => true,
+                    'event' => [
+                        'title' => $title,
+                        'element' => $body
+                    ]
+                ], 
+                $user['id']
+            );
+        }
+
     }
     private function _replacePlaceholders(string $text, string $projectLabel, string $projectDate, string $deadlineDate): string {
         $text = str_replace('{project_name}', $projectLabel, $text);
