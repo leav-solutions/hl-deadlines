@@ -37,8 +37,11 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     /**
      * @var array
      */
-    protected static $_projectsWorkflowIds = [63];//[43];
-
+    protected static $_projectsWorkflowIds = [43];
+    /**
+     * @var int
+     */
+    protected static $_projectsWorkflowTestId = 63;
     /**
      * @var string|bool
      */
@@ -136,6 +139,8 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     public function index() {
         $this->view->testStatusId = self::$_configurationTestWorkflowId;
         $this->view->testStatusLabel = Kbx_Roles::getTranslationLabel(self::$_configurationTestWorkflowId);
+        $this->view->projectsTestStatusId = self::$_projectsWorkflowTestId;
+        $this->view->projectsTestStatusLabel = Kbx_Roles::getTranslationLabel(self::$_projectsWorkflowTestId);
     }
     public function runTest() {
         try {
@@ -171,8 +176,13 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     private function _getProjectsByStatus(): array {
         $db = Zend_Registry::getInstance()->dbAdapter;
         $select = $db->select()
-            ->from('k_record_4', ['id_record'])
-            ->where('lca_id IN (?)', implode(',', self::$_projectsWorkflowIds));
+            ->from('k_record_4', ['id_record']);
+        if ($this->_test === 1) {
+            $select->where('lca_id=?', self::$_projectsWorkflowTestId);
+        } else {
+            $select->where('lca_id IN (?)', implode(',', self::$_projectsWorkflowIds));
+        }
+            
         $res = $db->fetchAll($select);
         return array_column($res, 'id_record');
     }
