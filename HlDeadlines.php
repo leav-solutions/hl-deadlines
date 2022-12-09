@@ -141,6 +141,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                 'configsWithProjectsAndNotifications' => $configsWithProjectsAndNotifications,
                 'configsWithProjectsAndNotificationsAndRecipients' => $configsWithProjectsAndNotificationsAndRecipients
             ];
+            $this->_sendNotifications($configsWithProjectsAndNotificationsAndRecipients);
         } catch (Exception $e) {
             $this->view->data = [
                 'message' => $e->getMessage(),
