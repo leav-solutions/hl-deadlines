@@ -304,15 +304,14 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                     $config['id_record'], 
                     self::$_configurationRecipientsAttributeId
                 );
-                $config['recipients'] = $recipientsValues;
-                /*$config['recipients'] = [];
+                $config['recipients'] = [];
                 foreach ($recipientsValues as $recipientValue) {
                     $mail = Kbx_Users::getLogin($recipientValue['value']);
-                    $recipients[] = [
+                    $config['recipients'][] = [
                         'id' => $recipientValue['value'],
                         'mail' => $mail
                     ];
-                }*/
+                }
                 return $config;
             },
             $configs
