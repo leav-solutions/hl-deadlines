@@ -250,7 +250,9 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                     if ($todayTimeStamp >= $project['values'][(int)$config['dateAttribute'].'_triggerDate_timestamp']) {
                         $config['matchingProjects'][] = [
                             'id_record' => $project['id_record'],
-                            'timestamp' => $project['values'][(int)$config['dateAttribute'].'_timestamp']
+                            'timestamp' => $project['values'][(int)$config['dateAttribute'].'_timestamp'],
+                            'date' => $project['values'][(int)$config['dateAttribute']],
+                            'triggerDate' => $project['values'][(int)$config['dateAttribute'].'_triggerDate']
                         ];
                     }
                 }
@@ -299,14 +301,14 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                 $deadlineName = (string)Kbx_Attributes::getAttributeLabel($config['dateAttribute']);
                 $config['matchingProjects'] = array_map(
                     function($project) use (&$config, $deadlineName) {
-                        $deadlineDate = '???';
+                        $deadlineDate = $project['triggerDate'];
                         $projectRecord = new Kbx_Records(
                             $project['id_record'], 
                             Kbx_Libraries::$projectsLibraryId, 
                             $project['id_record']
                         );
                         $projectLabel = $projectRecord->getLabel();
-                        $projectDate = (string)date($this->_dateFormats[$this->_lang]['php'], $project['timestamp']);
+                        $projectDate = $project['date'];
                         $project['title'] = $this->_replacePlaceholders(
                             $config['title'], 
                             $projectLabel, 
