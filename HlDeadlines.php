@@ -352,6 +352,9 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                 ], 
                 $user['id']
             );
+            error_log("notif sent to user ".print_r($user, true));
+        } else {
+            error_log("user ".print_r($user, true)." is not in onlineusers : ".print_r($whoIsOnline, true));
         }
 
     }
