@@ -25,7 +25,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     /**
      * @var int
      */
-    protected static $_configurationBodyAttributeId = 872;
+    protected static $_configurationBodyAttributeId = 877;
     /**
      * @var int
      */
@@ -285,8 +285,9 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                     self::$_configurationBodyAttributeId
                 );
                 $deadlineDate = (string)date($this->_dateFormats[$this->_lang]['php'], $config['limitTimestamp']);
+                $deadlineName = (string)Kbx_Attributes::getAttributeLabel($config['dateAttribute']);
                 $config['matchingProjects'] = array_map(
-                    function($project) use (&$config, $deadlineDate) {
+                    function($project) use (&$config, $deadlineDate, $deadlineName) {
                         $projectRecord = new Kbx_Records(
                             $project['id_record'], 
                             Kbx_Libraries::$projectsLibraryId, 
@@ -294,8 +295,20 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                         );
                         $projectLabel = $projectRecord->getLabel();
                         $projectDate = (string)date($this->_dateFormats[$this->_lang]['php'], $project['timestamp']);
-                        $project['title'] = $this->_replacePlaceholders($config['title'], $projectLabel, $projectDate, $deadlineDate);
-                        $project['body'] = $this->_replacePlaceholders($config['body'], $projectLabel, $projectDate, $deadlineDate);
+                        $project['title'] = $this->_replacePlaceholders(
+                            $config['title'], 
+                            $projectLabel, 
+                            $projectDate, 
+                            $deadlineDate, 
+                            $deadlineName
+                        );
+                        $project['body'] = $this->_replacePlaceholders(
+                            $config['body'], 
+                            $projectLabel, 
+                            $projectDate, 
+                            $deadlineDate, 
+                            $deadlineName
+                        );
                         return $project;
                     },
                     $config['matchingProjects']
@@ -351,14 +364,15 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                 $user['id']
             );
         }
-        $mailer = new Kbx_Mail();
-        $mailer->send($user['mail'], '', $title, $body);
+        /*$mailer = new Kbx_Mail();
+        $mailer->send($user['mail'], '', $title, $body);*/
 
     }
-    private function _replacePlaceholders(string $text, string $projectLabel, string $projectDate, string $deadlineDate): string {
+    private function _replacePlaceholders(string $text, string $projectLabel, string $projectDate, string $deadlineDate, string $deadlineName): string {
         $text = str_replace('{project_name}', $projectLabel, $text);
         $text = str_replace('{project_date}', $projectDate, $text);
         $text = str_replace('{deadline_date}', $deadlineDate, $text);
+        $text = str_replace('{deadline_name}', $deadlineName, $text);
         return $text;
     }
 }
