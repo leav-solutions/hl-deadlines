@@ -31,6 +31,10 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
      */
     protected static $_configurationRecipientsAttributeId = 870;
     /**
+     * @var int
+     */
+    protected static $_configurationTestWorkflowId = 88;
+    /**
      * @var array
      */
     protected static $_projectsWorkflowIds = [63];//[43];
@@ -62,6 +66,10 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
      * @var string
      */
     protected $_lang;
+    /**
+     * @var bool
+     */
+    protected $_test;
     // phpcs:ignore Zend.NamingConventions.ValidVariableName
     /**
      * @var string
@@ -79,6 +87,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
 
         $this->_dateFormats = Zend_Registry::getInstance()->dateFormats;
         $this->_lang = Zend_Registry::getInstance()->Zend_Locale->getLanguage();
+        $this->_test = false;
 
     }
     public function getViewsPath(): string {
@@ -126,6 +135,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     }
     public function index() {
         try {
+            $this->_test = true;
             $projects = $this->_getProjectsByStatus();
             $configs = $this->_getConfigurations();
             $projectsWithValues = $this->_retrieveProjectsValues($projects, $configs);
@@ -174,20 +184,16 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                     'delay' => 'attribute_'.self::$_configurationDelayAttributeId
                 ]
             )
-            ->where('attribute_'.self::$_configurationDateAttributeId.' IS NOT NULL')
-            ->where('lca_id IS NULL');
+            ->where('attribute_'.self::$_configurationDateAttributeId.' IS NOT NULL');
+            
+            if ($this->_test) {
+                $select->where('lca_id=?', self::$_configurationTestWorkflowId);
+            } else {
+                $select->where('lca_id IS NULL');
+            }
+
         $configs = $db->fetchAll($select);
-        /*$configs = array_map(
-            function($config) {
-                $configDateLimit = new DateTime();
-                $delayStr = '-'.(abs((int)$config['delay']));
-                $configDateLimit->modify("$delayStr day");
-                $configDateLimit->setTime(0, 0, 0);
-                $config['limitTimestamp'] = $configDateLimit->getTimestamp();
-                return $config;
-            },
-            $res
-        );*/
+        
         return $configs;
     }
     private function _retrieveProjectsValues(array $projects, array $configs): array {
@@ -378,9 +384,10 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                 $user['id']
             );
         }
-        /*$mailer = new Kbx_Mail();
-        $mailer->send($user['mail'], '', $title, $body);*/
-
+        if (!$this->_test) {
+            $mailer = new Kbx_Mail();
+            $mailer->send($user['mail'], '', $title, $body);
+        }
     }
     private function _replacePlaceholders(string $text, string $projectLabel, string $projectDate, string $deadlineDate, string $deadlineName): string {
         $text = str_replace('{project_name}', $projectLabel, $text);
