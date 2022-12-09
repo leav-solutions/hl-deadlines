@@ -341,7 +341,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     }
     private function _sendNotification(array $whoIsOnline, array $user, string $title, string $body) {
         if (in_array((int)$user['id'], $whoIsOnline)) {
-            Kbx_RealTimeMessage::emit(
+            $res = Kbx_RealTimeMessage::emit(
                 [
                     'type' => 'notification',
                     'important' => true,
@@ -352,7 +352,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                 ], 
                 $user['id']
             );
-            error_log("notif sent to user ".print_r($user, true));
+            error_log("notif sent to user ".print_r($user, true).", return ".(int)$res);
         } else {
             error_log("user ".print_r($user, true)." is not in onlineusers : ".print_r($whoIsOnline, true));
         }
