@@ -385,7 +385,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     private function _replacePlaceholders(string $text, string $projectLabel, string $projectDate, string $deadlineDate, string $deadlineName): string {
         $text = str_replace('{project_name}', $projectLabel, $text);
         $text = str_replace('{project_date}', $projectDate, $text);
-        $text = str_replace('{deadline_date}', $deadlineDate, $text);
+        $text = str_replace('{trigger_date}', $deadlineDate, $text);
         $text = str_replace('{deadline_name}', $deadlineName, $text);
         return $text;
     }
