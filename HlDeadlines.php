@@ -172,6 +172,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         $this->_test = (int)$this->params['test_mode'];
         $this->view->test_mode = $this->_test;
         $this->_run();
+        $this->view->data['params'] = $this->params;
     }
     
     public function runCli(array $params) {
