@@ -3,9 +3,7 @@
 <?php foreach ($this->data as $keySection => $section) : ?>
     <h3><span style="margin-left:3em;"><?= $keySection ?></span></h3>
     <div>
-        <pre>
-            <?php print_r($section); ?>
-        </pre>
+        <pre><?php print_r($section); ?></pre>
     </div>
 <?php endforeach; ?>
 </div>
@@ -25,6 +23,7 @@ $('#<?= $this->dialogId ?>').dialog('option','buttons',{
 .dialog('option','position','center');
 $('#accordion_<?= $this->dialogId ?>').accordion({
     collapsible: true,
-    active: false
+    active: false,
+    heightStyle: 'fill'
 });
 </script>
