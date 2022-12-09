@@ -272,9 +272,29 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                     self::$_configurationLibraryId, 
                     self::$_configurationBodyAttributeId
                 );
+                $config['matchingProjects'] = array_map(
+                    function($project) use (&$config) {
+                        $projectRecord = new Kbx_Records(
+                            $project['id_record'], 
+                            Kbx_Libraries::$projectsLibraryId, 
+                            $project['id_record']
+                        );
+                        $projectLabel = $projectRecord->getLabel();
+                        $projectDate = (string)date($this->_dateFormats[$this->_lang]['php'], $project['timestamp']);
+                        $project['title'] = $this->_replacePlaceholders($config['title'], $projectLabel, $projectDate);
+                        $project['body'] = $this->_replacePlaceholders($config['body'], $projectLabel, $projectDate);
+                        return $project;
+                    },
+                    $config['matchingProjects']
+                );
                 return $config;
             },
             $configsWithProjects
         );
+    }
+    private function _replacePlaceholders(string $text, string $projectLabel, string $projectDate): string {
+        $text = str_replace('{project_name}', $projectLabel, $text);
+        $text = str_replace('{project_date}', $projectDate, $text);
+        return $text;
     }
 }
