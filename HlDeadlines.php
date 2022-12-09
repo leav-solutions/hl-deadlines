@@ -272,8 +272,9 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                     self::$_configurationLibraryId, 
                     self::$_configurationBodyAttributeId
                 );
+                $deadlineDate = (string)date($this->_dateFormats[$this->_lang]['php'], $config['limitTimestamp']);
                 $config['matchingProjects'] = array_map(
-                    function($project) use (&$config) {
+                    function($project) use (&$config, $deadlineDate) {
                         $projectRecord = new Kbx_Records(
                             $project['id_record'], 
                             Kbx_Libraries::$projectsLibraryId, 
@@ -281,8 +282,8 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                         );
                         $projectLabel = $projectRecord->getLabel();
                         $projectDate = (string)date($this->_dateFormats[$this->_lang]['php'], $project['timestamp']);
-                        $project['title'] = $this->_replacePlaceholders($config['title'], $projectLabel, $projectDate);
-                        $project['body'] = $this->_replacePlaceholders($config['body'], $projectLabel, $projectDate);
+                        $project['title'] = $this->_replacePlaceholders($config['title'], $projectLabel, $projectDate, $deadlineDate);
+                        $project['body'] = $this->_replacePlaceholders($config['body'], $projectLabel, $projectDate, $deadlineDate);
                         return $project;
                     },
                     $config['matchingProjects']
@@ -292,9 +293,10 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             $configsWithProjects
         );
     }
-    private function _replacePlaceholders(string $text, string $projectLabel, string $projectDate): string {
+    private function _replacePlaceholders(string $text, string $projectLabel, string $projectDate, string $deadlineDate): string {
         $text = str_replace('{project_name}', $projectLabel, $text);
         $text = str_replace('{project_date}', $projectDate, $text);
+        $text = str_replace('{deadline_date}', $deadlineDate, $text);
         return $text;
     }
 }
