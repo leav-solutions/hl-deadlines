@@ -335,8 +335,6 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                     $this->_sendNotification($whoIsOnline, $recipient, $project['title'], $project['body']);
                 }
             }
-            
-
         }
     }
     private function _sendNotification(array $whoIsOnline, array $user, string $title, string $body) {
@@ -352,10 +350,8 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                 ], 
                 $user['id']
             );
-            error_log("notif sent to user ".print_r($user, true).", return ".(int)$res);
-        } else {
-            error_log("user ".print_r($user, true)." is not in onlineusers : ".print_r($whoIsOnline, true));
         }
+        Kbx_Mail::send($user['mail'], '', $title, $body);
 
     }
     private function _replacePlaceholders(string $text, string $projectLabel, string $projectDate, string $deadlineDate): string {
