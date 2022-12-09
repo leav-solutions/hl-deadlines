@@ -67,7 +67,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
      */
     protected $_lang;
     /**
-     * @var bool
+     * @var int
      */
     protected $_test;
     // phpcs:ignore Zend.NamingConventions.ValidVariableName
@@ -87,7 +87,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
 
         $this->_dateFormats = Zend_Registry::getInstance()->dateFormats;
         $this->_lang = Zend_Registry::getInstance()->Zend_Locale->getLanguage();
-        $this->_test = false;
+        $this->_test = 0;
 
     }
     public function getViewsPath(): string {
@@ -139,7 +139,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     }
     public function runTest() {
         try {
-            $this->_test = true;
+            $this->_test = 1;
             $projects = $this->_getProjectsByStatus();
             $configs = $this->_getConfigurations();
             $projectsWithValues = $this->_retrieveProjectsValues($projects, $configs);
@@ -190,7 +190,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             )
             ->where('attribute_'.self::$_configurationDateAttributeId.' IS NOT NULL');
             
-            if ($this->_test) {
+            if ($this->_test === 1) {
                 $select->where('lca_id=?', self::$_configurationTestWorkflowId);
             } else {
                 $select->where('lca_id IS NULL');
@@ -345,6 +345,13 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     private function _addRecipients(array $configs): array {
         return array_map(
             function($config) {
+                if ($this->_test !== 0) {
+                    $recipientsValues = [
+                        [
+                            'value' => Kbx_Users::getCurrentUserId()
+                        ]
+                    ];
+                }
                 $recipientsValues = Kbx_Attributes::getValue(
                     0, 
                     self::$_configurationLibraryId, 
@@ -388,7 +395,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                 $user['id']
             );
         }
-        if (!$this->_test) {
+        if (!$this->_test !== 1) {
             $mailer = new Kbx_Mail();
             $mailer->send($user['mail'], '', $title, $body);
         }
