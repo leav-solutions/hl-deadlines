@@ -218,13 +218,10 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         );
     }
     private function _getValue(int $idRecord, int $idLibrary, int $idAttribute, int $idProject = 0):string {
-        error_log("_getValue(int $idRecord, int $idLibrary, int $idAttribute, int $idProject = 0)");
         if ($idRecord === 0 || $idLibrary === 0 || $idAttribute === 0) {
-            error_log("return ''");
             return '';
         }
         $values = Kbx_Attributes::getValue($idProject, $idLibrary, $idRecord, $idAttribute);
-        error_log(print_r($values, true));
         return sizeof($values)>0
             ? $values[0]['value']
             : '';
