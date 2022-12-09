@@ -130,15 +130,18 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             $configs = $this->_getConfigurations();
             $projectsWithValues = $this->_retrieveProjectsValues($projects, $configs);
             $configsWithProjects = $this->_groupProjectsByDeadline($projectsWithValues, $configs);
+            $configsWithProjects = $this->_filterDeadlinesWithoutProject($configsWithProjects);
             $configsWithProjectsAndNotifications = $this->_generateNotificationsTexts($configsWithProjects);
             $configsWithProjectsAndNotificationsAndRecipients = $this->_addRecipients($configsWithProjectsAndNotifications);
+            $whoIsOnline = Kbx_RealTimeMessage::getConnectedUsers();
             $this->view->data = [
                 'projects' => $projects,
                 'configs' => $configs,
                 'projectsWithValues' => $projectsWithValues,
                 'configWithProjects' => $configsWithProjects,
                 'configsWithProjectsAndNotifications' => $configsWithProjectsAndNotifications,
-                'configsWithProjectsAndNotificationsAndRecipients' => $configsWithProjectsAndNotificationsAndRecipients
+                'configsWithProjectsAndNotificationsAndRecipients' => $configsWithProjectsAndNotificationsAndRecipients,
+                'whoIsOnline' => $whoIsOnline
             ];
         } catch (Exception $e) {
             $this->view->data = [
@@ -248,6 +251,14 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         );
         return $configsWithProjects;
     }
+    private function _filterDeadlinesWithoutProject(array $configs): array {
+        return array_filter(
+            $configs,
+            function ($config) {
+                return sizeof($config['matchingProjects']) > 0;
+            }
+        );
+    }
     private function _dateStringToTimestamp(string $dateStr): int {
         if ((string)intval($dateStr) === $dateStr) {
             // we recieved a timestamp, no need to convert, but set to 00h:00m:00s
@@ -316,6 +327,18 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             },
             $configs
         );
+    }
+    private function _sendNotifications(array $configs): void {
+        $whoIsOnline = Kbx_RealTimeMessage::getConnectedUsers();
+        foreach ($configs as $config) {
+            foreach ($config['recipients'] as $recipient) {
+                foreach ($config['matchingProjects'] as $project) {
+
+                }
+            }
+            
+
+        }
     }
     private function _replacePlaceholders(string $text, string $projectLabel, string $projectDate, string $deadlineDate): string {
         $text = str_replace('{project_name}', $projectLabel, $text);
