@@ -411,7 +411,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                 $user['id']
             );
         }
-        if (!$this->_test !== 1) {
+        if ($this->_test !== 1) {
             $mailer = new Kbx_Mail();
             $mailer->send($user['mail'], '', $title, $body);
         }
