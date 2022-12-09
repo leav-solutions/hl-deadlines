@@ -176,8 +176,8 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             )
             ->where('attribute_'.self::$_configurationDateAttributeId.' IS NOT NULL')
             ->where('lca_id IS NULL');
-        $res = $db->fetchAll($select);
-        $configs = array_map(
+        $configs = $db->fetchAll($select);
+        /*$configs = array_map(
             function($config) {
                 $configDateLimit = new DateTime();
                 $delayStr = '-'.(abs((int)$config['delay']));
@@ -187,7 +187,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                 return $config;
             },
             $res
-        );
+        );*/
         return $configs;
     }
     private function _retrieveProjectsValues(array $projects, array $configs): array {
@@ -198,6 +198,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                     'values' => []
                 ];
                 foreach ($configs as $config) {
+                    $delayStr = '-'.(abs((int)$config['delay']));
                     $projectData['values'][(int)$config['dateAttribute']] = $this->_getValue(
                         (int)$projectId, 
                         Kbx_Libraries::$projectsLibraryId, 
@@ -211,6 +212,12 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                         (int)$projectId
                     );
                     $projectData['values'][(int)$config['dateAttribute'].'_timestamp'] = $this->_dateStringToTimestamp($projectData['values'][(int)$config['dateAttribute']]);
+                    $triggerDate = new DateTime();
+                    $triggerDate->setTimestamp($projectData['values'][(int)$config['dateAttribute'].'_timestamp']);
+                    $triggerDate->modify("$delayStr day");
+                    $triggerDate->setTime(0, 0, 0);
+                    $projectData['values'][(int)$config['dateAttribute'].'_triggerDate'] = date($this->_dateFormats[$this->_lang]['php'], $triggerDate->getTimestamp());
+                    $projectData['values'][(int)$config['dateAttribute'].'_triggerDate_timestamp'] = $triggerDate->getTimestamp();
                 }
                 return $projectData;
             },
@@ -227,8 +234,11 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             : '';
     }
     private function _groupProjectsByDeadline(array $projectsWithValues, array $configs): array {
+        $today = new DateTime();
+        $today->setTime(0, 0, 0);;
+        $todayTimeStamp = $today->getTimestamp();
         $configsWithProjects = array_map(
-            function ($config) use ($projectsWithValues) {
+            function ($config) use ($projectsWithValues, $todayTimeStamp) {
                 $config['matchingProjects'] = [];
                 foreach ($projectsWithValues as $project) {
                     // check the done value
@@ -236,7 +246,8 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                         // ignore this project cause marked as done for this config
                         continue;
                     }
-                    if ($project['values'][(int)$config['dateAttribute'].'_timestamp'] <= $config['limitTimestamp']) {
+                    //if ($project['values'][(int)$config['dateAttribute'].'_timestamp'] <= $config['limitTimestamp']) {
+                    if ($todayTimeStamp >= $project['values'][(int)$config['dateAttribute'].'_triggerDate_timestamp']) {
                         $config['matchingProjects'][] = [
                             'id_record' => $project['id_record'],
                             'timestamp' => $project['values'][(int)$config['dateAttribute'].'_timestamp']
@@ -284,10 +295,11 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                     self::$_configurationLibraryId, 
                     self::$_configurationBodyAttributeId
                 );
-                $deadlineDate = (string)date($this->_dateFormats[$this->_lang]['php'], $config['limitTimestamp']);
+                
                 $deadlineName = (string)Kbx_Attributes::getAttributeLabel($config['dateAttribute']);
                 $config['matchingProjects'] = array_map(
-                    function($project) use (&$config, $deadlineDate, $deadlineName) {
+                    function($project) use (&$config, $deadlineName) {
+                        $deadlineDate = '???';
                         $projectRecord = new Kbx_Records(
                             $project['id_record'], 
                             Kbx_Libraries::$projectsLibraryId, 
