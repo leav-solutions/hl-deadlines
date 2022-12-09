@@ -351,7 +351,8 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                 $user['id']
             );
         }
-        Kbx_Mail::send($user['mail'], '', $title, $body);
+        $mailer = new Kbx_Mail();
+        $mailer->send($user['mail'], '', $title, $body);
 
     }
     private function _replacePlaceholders(string $text, string $projectLabel, string $projectDate, string $deadlineDate): string {
