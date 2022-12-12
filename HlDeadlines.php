@@ -145,6 +145,8 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     public function overview() {
         $this->layout = 'layout';
 
+        $this->_test = 1;
+
         $projects = $this->_getProjectsByStatus();
         $configs = $this->_getConfigurations();
         $projectsWithValues = $this->_retrieveProjectsValues($projects, $configs);
