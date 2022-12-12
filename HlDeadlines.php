@@ -142,6 +142,9 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         $this->view->projectsTestStatusId = self::$_projectsWorkflowTestId;
         $this->view->projectsTestStatusLabel = Kbx_Roles::getTranslationLabel(self::$_projectsWorkflowTestId);
     }
+    public function overview() {
+        $this->layout = 'layout';
+    }
     private function _run() {
         try {
             $projects = $this->_getProjectsByStatus();
