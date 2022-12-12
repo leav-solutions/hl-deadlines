@@ -313,6 +313,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     private function _generateNotificationsTexts(array $configsWithProjects): array {
         return array_map(
             function($config) {
+                $configRecord = new Kbx_Records($config['id_record'], self::$_configurationLibraryId);
                 $config['title'] = $this->_getValue(
                     $config['id_record'], 
                     self::$_configurationLibraryId, 
@@ -324,7 +325,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                     self::$_configurationBodyAttributeId
                 );
                 
-                $deadlineName = (string)Kbx_Attributes::getAttributeLabel($config['dateAttribute']);
+                $deadlineName = (string)$configRecord->getLabel();
                 $config['matchingProjects'] = array_map(
                     function($project) use (&$config, $deadlineName) {
                         $deadlineDate = $project['triggerDate'];
