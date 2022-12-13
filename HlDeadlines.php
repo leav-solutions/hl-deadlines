@@ -427,10 +427,10 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                 $user['id']
             );
         }
-        if ($this->_test !== 1) {
+        //if ($this->_test !== 1) {
             $mailer = new Kbx_Mail();
             $mailer->send($user['mail'], '', $title, $body);
-        }
+        //}
     }
     private function _replacePlaceholders(string $text, string $projectLabel, string $projectDate, string $deadlineDate, string $deadlineName): string {
         $text = str_replace('{project_name}', $projectLabel, $text);
