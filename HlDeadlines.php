@@ -131,9 +131,11 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         try {
             $this->$functionName();
         } catch (Exception $e) {
-            $this->logError($e->getMessage());
+            /*$this->logError($e->getMessage());
             $this->logError($e->getTraceAsString());
-            $this->logEnd(1);
+            $this->logEnd(1);*/
+            error_log($e->getMessage());
+            error_log($e->getTraceAsString());
         }
     }
     public function index() {
