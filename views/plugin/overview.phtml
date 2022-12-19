@@ -1,3 +1,48 @@
+<?php
+$today = new DateTime();
+$today->setTime(0,0,0);
+$todayTimestamp = $today->getTimestamp();
+
+$lateDeadlines = [];
+for ($i=1; $i<4; $i++) {
+  $lateDeadlines[] = [
+    'deadlineDate' => $todayTimestamp - ($i*86400),
+    'deadlineName' => "Late deadline $i",
+    'projectName' => "Late project $i"
+  ];
+}
+$todayDeadlines = [];
+for ($i=1; $i<6; $i++) {
+  $todayDeadlines[] = [
+    'deadlineDate' => $todayTimestamp,
+    'deadlineName' => "Today deadline $i",
+    'projectName' => "Today project $i"
+  ];
+}
+$upcomingDeadlines = [];
+for ($i=1; $i<10; $i++) {
+  $upcomingDeadlines[] = [
+    'deadlineDate' => $todayTimestamp + (86400*$i*3),
+    'deadlineName' => "Upcoming deadline $i",
+    'projectName' => "Upcoming project $i"
+  ];
+}
+
+$renderDeadline = function ($deadlineDate, $deadlineName, $projectName) {
+  $dayNumber = date('d', $deadlineDate);
+  $monthShort = date('M', $deadlineDate);
+  echo "<div class=\"deadline\">
+  <div class=\"date\">
+    <span class=\"day\">$dayNumber</span>
+    <span class=\"month\">$monthShort</span>
+  </div>
+  <div class=\"texts\">
+    <div class=\"title\">$deadlineName</div>
+    <div class=\"project\">$projectName</div>
+  </div>
+</div>";
+};
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,14 +50,159 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="HL REPRO">
+  <meta http-equiv="refresh" content="1800">
   <style type="text/css">
+html, body, #container {
+  width: 100vw;
+  height: 100vh;
+  padding:0;
+  margin:0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+#container {
+  /*background: linear-gradient(0deg, #2f809d 0%, #3fa1c6 100%);*/
+  background: linear-gradient(-45deg, #ecee52, #b1e73c, #23a6d5, #23d5ab);
+	background-size: 200% 200%;
+	animation: gradient 180s ease infinite;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+.header {
+  flex: 0 0 50px;
+  color:#fff;
+  line-height:50px;
+  padding: 0 1em;
+  mix-blend-mode: overlay;
+}
+.groups {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: stretch;
+  gap: 1em;
+  padding: 0 1em 1em 1em;
+}
+.group {
+  flex: 1 1 33%;
+  position:relative;
+  display:flex;
+  flex-direction: column;
+  gap: .5em; 
+}
+.group::before {
+  content: "";
+  display:block;
+  position:absolute;
+  top:0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 1);
+  border: 2px solid #fff;
+  border-radius: 10px;
+  mix-blend-mode: soft-light;
+  --color: #000;
+}
+.group.late {
+  --color : #ae1b2d;
+}
+.group.today {
+  --color : #dc911b;
+}
+.group.upcoming {
+  --color : #009657;
+}
+.group h3 {
+  text-align: center;
+  margin: 0;
+  padding: .25em;
+  font-size:1.5em;
+  border-radius: 10px 10px 0 0;
+  background:rgba(255, 255, 255, .8);
+  color: var(--color);
+}
+.deadline {
+  flex: 0 0 auto;
+  display:flex;
+  flex-direction: row;
+  background:rgba(255, 255, 255, 0.8);
+  padding: .25em;
+  margin: 0 .5em;
+  position:relative;
+}
+.deadline .clear {
+  clear: both;
+}
+.deadline .date { 
+  width: 3em;
+  height: 3em;
+  flex: 0 0 3em;
+  background: var(--color);
+  color: #fff;
+  text-align:center;
+  margin-right: .25em;
+}
+.deadline .date .day {
+  font-size: 1.5em;
+}
+.deadline .texts {
+  display:flex;
+  flex-direction: column;
+}
+.deadline .title, .deadline .project {
+  flex: 1 1 auto;
+  line-height: 1.5em;
+}
+.title {
+  font-weight: bolder;
+  text-transform: uppercase;
+  color: var(--color);
+}
+.project {
+  font-style: italic;
+}
   </style>
 </head>
 <body>
-<h1>OVERVIEW</h1>
-<pre>
-    <?php print_r($this->data); ?>
-</pre>
+<div id="container">
+  <div class="header">Last update : <?= $this->lastUpdate ?></div>
+  <div class="groups">
+    <div class="group late">
+      <h3>LATE</h3>
+      <?php foreach ($lateDeadlines as $deadline) {
+        $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName']);
+      } ?>
+      <pre>
+        <?php print_r($this->data); ?>
+      </pre>
+    </div>
+    <div class="group today">
+      <h3>TODAY</h3>
+      <?php foreach ($todayDeadlines as $deadline) {
+        $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName']);
+      } ?>
+    </div>
+    <div class="group upcoming">
+      <h3>UPCOMING</h3>
+      <?php foreach ($upcomingDeadlines as $deadline) {
+        $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName']);
+      } ?>
+    </div>
+  </div>
+</div>
 <script type="text/javascript">
 
 

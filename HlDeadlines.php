@@ -147,10 +147,11 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
 
         $this->_test = 1;
 
+        $this->view->lastUpdate = date($this->_dateFormats[$this->_lang]['php'].' H:i:s', time());
+
         $projects = $this->_getProjectsByStatus();
         $configs = $this->_getConfigurations();
         $projectsWithValues = $this->_retrieveProjectsValues($projects, $configs);
-
         $this->view->data = [
             'projects' => $projects,
             'configs' => $configs,
