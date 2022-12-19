@@ -28,6 +28,13 @@ for ($i=1; $i<10; $i++) {
   ];
 }
 
+
+$deadlines = [
+  'late' => [],
+  'today' => [],
+  'upcoming' => []
+];
+
 $renderDeadline = function ($deadlineDate, $deadlineName, $projectName) {
   $dayNumber = date('d', $deadlineDate);
   $monthShort = date('M', $deadlineDate);
@@ -182,7 +189,7 @@ html, body, #container {
   <div class="groups">
     <div class="group late">
       <h3>LATE</h3>
-      <?php foreach ($lateDeadlines as $deadline) {
+      <?php foreach ($dealines['late'] as $deadline) {
         $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName']);
       } ?>
       <pre>
@@ -191,13 +198,13 @@ html, body, #container {
     </div>
     <div class="group today">
       <h3>TODAY</h3>
-      <?php foreach ($todayDeadlines as $deadline) {
+      <?php foreach ($dealdines['today'] as $deadline) {
         $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName']);
       } ?>
     </div>
     <div class="group upcoming">
       <h3>UPCOMING</h3>
-      <?php foreach ($upcomingDeadlines as $deadline) {
+      <?php foreach ($deadlines['upcoming'] as $deadline) {
         $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName']);
       } ?>
     </div>
