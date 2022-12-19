@@ -298,7 +298,8 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                             'id_record' => $project['id_record'],
                             'timestamp' => $project['values'][(int)$config['dateAttribute'].'_timestamp'],
                             'date' => $project['values'][(int)$config['dateAttribute']],
-                            'triggerDate' => $project['values'][(int)$config['dateAttribute'].'_triggerDate']
+                            'triggerDate' => $project['values'][(int)$config['dateAttribute'].'_triggerDate'],
+                            'triggerTimestamp' => $project['values'][(int)$config['dateAttribute'].'_triggerDate_timestamp']
                         ];
                     }
                 }
