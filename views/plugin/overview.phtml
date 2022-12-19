@@ -189,7 +189,7 @@ html, body, #container {
   <div class="groups">
     <div class="group late">
       <h3>LATE</h3>
-      <?php foreach ($dealines['late'] as $deadline) {
+      <?php foreach ($deadlines['late'] as $deadline) {
         $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName']);
       } ?>
       <pre>
@@ -198,7 +198,7 @@ html, body, #container {
     </div>
     <div class="group today">
       <h3>TODAY</h3>
-      <?php foreach ($dealdines['today'] as $deadline) {
+      <?php foreach ($deadlines['today'] as $deadline) {
         $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName']);
       } ?>
     </div>
