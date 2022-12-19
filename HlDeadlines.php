@@ -128,6 +128,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         $this->view->title      = "HL Deadlines";
         $this->view->dialogId   = isset($this->params['dialogId']) ? $this->params['dialogId'] : '';
         $functionName           = $this->params['execute'];
+        error_log("functionName : $functionName");
         try {
             $this->$functionName();
         } catch (Exception $e) {
