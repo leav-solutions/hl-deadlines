@@ -54,7 +54,12 @@ if ($this->fakeDatas === true) {
     ];
   }
 }
-
+usort(
+  $deadlines['late'], 
+  function ($a, $b) {
+    return ($a['deadlineDate'] < $b['deadlineDate']) ? -1 : 1;
+  }
+);
 usort(
   $deadlines['upcoming'], 
   function ($a, $b) {
