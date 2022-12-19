@@ -73,6 +73,10 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
      * @var int
      */
     protected $_test;
+    /**
+     * @var string
+     */
+    protected static $_overviewAccesKey = 'gb6nQxQ6Pa';
     // phpcs:ignore Zend.NamingConventions.ValidVariableName
     /**
      * @var string
@@ -143,14 +147,24 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         $this->view->testStatusLabel = Kbx_Roles::getTranslationLabel(self::$_configurationTestWorkflowId);
         $this->view->projectsTestStatusId = self::$_projectsWorkflowTestId;
         $this->view->projectsTestStatusLabel = Kbx_Roles::getTranslationLabel(self::$_projectsWorkflowTestId);
+        $this->view->overviewUrl = $this->_getOverviewUrl();
     }
     public function overview() {
         $this->layout = 'layout';
 
-        //$this->_test = 1;
+        $accessKey = isset($this->params['key'])
+            ? $this->params['key']
+            : '';
+        
+        if ($accessKey != self::$_overviewAccesKey) {
+            $this->viewRenderer = 'forbidden';
+        }
+
         $this->_test = isset($this->params['test'])
             ? (int)$this->params['test']
             : 0;
+
+        $this->view->fakeDatas = isset($this->params['fake']) && $this->params['fake'] == 1;
 
         $this->view->lastUpdate = date($this->_dateFormats[$this->_lang]['php'].' H:i:s', time());
         $projects = $this->_getProjectsByStatus();
@@ -159,9 +173,6 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         $configsWithProjects = $this->_groupProjectsByDeadline($projectsWithValues, $configs);
         $configsWithProjects = $this->_filterDeadlinesWithoutProject($configsWithProjects);
         $this->view->data = [
-            'projects' => $projects,
-            'configs' => $configs,
-            'projectsWithValues' => $projectsWithValues,
             'configsWithProjects' => $configsWithProjects
         ];
     }
@@ -447,5 +458,10 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         $text = str_replace('{trigger_date}', $deadlineDate, $text);
         $text = str_replace('{deadline_name}', $deadlineName, $text);
         return $text;
+    }
+    private function _getOverviewUrl(): string {
+        $config = Zend_Registry::getInstance()->configuration;
+        $url = $config->public_host.'/plugin/index/plugin/HlDeadlines/execute/overview/key/'.self::$_overviewAccesKey;
+        return $url;
     }
 }

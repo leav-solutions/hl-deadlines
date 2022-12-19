@@ -1,33 +1,8 @@
 <?php
+$autoRefresh = 1800;
 $today = new DateTime();
 $today->setTime(0,0,0);
 $todayTimestamp = $today->getTimestamp();
-
-$lateDeadlines = [];
-for ($i=1; $i<4; $i++) {
-  $lateDeadlines[] = [
-    'deadlineDate' => $todayTimestamp - ($i*86400),
-    'deadlineName' => "Late deadline $i",
-    'projectName' => "Late project $i"
-  ];
-}
-$todayDeadlines = [];
-for ($i=1; $i<6; $i++) {
-  $todayDeadlines[] = [
-    'deadlineDate' => $todayTimestamp,
-    'deadlineName' => "Today deadline $i",
-    'projectName' => "Today project $i"
-  ];
-}
-$upcomingDeadlines = [];
-for ($i=1; $i<10; $i++) {
-  $upcomingDeadlines[] = [
-    'deadlineDate' => $todayTimestamp + (86400*$i*3),
-    'deadlineName' => "Upcoming deadline $i",
-    'projectName' => "Upcoming project $i"
-  ];
-}
-
 
 $deadlines = [
   'late' => [],
@@ -55,6 +30,38 @@ foreach ($this->data['configsWithProjects'] as $config) {
   }
 }
 
+if ($this->fakeDatas === true) {
+  for ($i=1; $i<4; $i++) {
+    $deadlines['late'][] = [
+      'deadlineDate' => $todayTimestamp - ($i*86400),
+      'deadlineName' => "Late deadline $i",
+      'projectName' => "Late project $i"
+    ];
+  }
+  for ($i=1; $i<6; $i++) {
+    $deadlines['today'][] = [
+      'deadlineDate' => $todayTimestamp,
+      'deadlineName' => "Today deadline $i",
+      'projectName' => "Today project $i"
+    ];
+  }
+  $upcomingDeadlines = [];
+  for ($i=1; $i<10; $i++) {
+    $deadlines['upcoming'][] = [
+      'deadlineDate' => $todayTimestamp + (86400*round(rand(1,25))),
+      'deadlineName' => "Upcoming deadline $i",
+      'projectName' => "Upcoming project $i"
+    ];
+  }
+}
+
+usort(
+  $deadlines['upcoming'], 
+  function ($a, $b) {
+    return ($a['deadlineDate'] < $b['deadlineDate']) ? -1 : 1;
+  }
+);
+
 //id_attribute_triggerDate_timestamp
 $renderDeadline = function ($deadlineDate, $deadlineName, $projectName) {
   $dayNumber = date('d', $deadlineDate);
@@ -78,7 +85,7 @@ $renderDeadline = function ($deadlineDate, $deadlineName, $projectName) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="HL REPRO">
-  <meta http-equiv="refresh" content="1800">
+  <meta http-equiv="refresh" content="<?= $autoRefresh ?>">
   <style type="text/css">
 html, body, #container {
   width: 100vw;
@@ -89,7 +96,7 @@ html, body, #container {
 }
 #container {
   /*background: linear-gradient(0deg, #2f809d 0%, #3fa1c6 100%);*/
-  background: linear-gradient(-45deg, #ecee52, #b1e73c, #23a6d5, #23d5ab);
+  background: linear-gradient(-45deg, #8CD523, #23a6d5);
 	background-size: 200% 200%;
 	animation: gradient 180s ease infinite;
   display: flex;
@@ -217,7 +224,7 @@ html, body, #container {
   margin:1px;
   height: calc(1em - 2px);
   left: 0;
-  animation: progress 1800s linear;
+  animation: progress <?= $autoRefresh ?>s linear;
   background: #fff;
 }
 @keyframes progress {
