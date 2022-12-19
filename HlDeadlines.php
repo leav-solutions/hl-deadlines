@@ -157,6 +157,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             'configs' => $configs,
             'projectsWithValues' => $projectsWithValues
         ];
+        error_log(print_r($this->view->data, true));
     }
     private function _run() {
         try {
