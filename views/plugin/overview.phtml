@@ -35,6 +35,26 @@ $deadlines = [
   'upcoming' => []
 ];
 
+foreach ($this->data['configsWithProjects'] as $config) {
+  $configRecord = new Kbx_Records($config['id_record'], 110);
+  $deadlineName = $configRecord->getLabel();
+  foreach ($config['matchingProjects'] as $project) {
+    $projectRecord = new Kbx_Records($project['id_record'], Kbx_Libraries::$projectsLibraryId);
+    $dealine = [
+      'deadlineDate' => $project['triggerTimestamp'],
+      'deadlineName' => $deadlineName,
+      'projectName' => $projectRecord->getLabel()
+    ];
+    if ($project['triggerTimestamp'] < $todayTimestamp) {
+      $deadlines['late'][] = $dealine;
+    } elseif ($project['triggerTimestamp'] == $todayTimestamp) {
+      $deadlines['today'][] = $dealine;
+    } else {
+      $deadlines['upcoming'][] = $dealine;
+    }
+  }
+}
+
 //id_attribute_triggerDate_timestamp
 $renderDeadline = function ($deadlineDate, $deadlineName, $projectName) {
   $dayNumber = date('d', $deadlineDate);
