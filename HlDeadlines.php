@@ -128,7 +128,6 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         $this->view->title      = "HL Deadlines";
         $this->view->dialogId   = isset($this->params['dialogId']) ? $this->params['dialogId'] : '';
         $functionName           = $this->params['execute'];
-        error_log("functionName : $functionName");
         try {
             $this->$functionName();
         } catch (Exception $e) {
@@ -151,20 +150,14 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         $this->_test = 1;
 
         $this->view->lastUpdate = date($this->_dateFormats[$this->_lang]['php'].' H:i:s', time());
-        error_log("1");
         $projects = $this->_getProjectsByStatus();
-        error_log("2");
         $configs = $this->_getConfigurations();
-        error_log("3");
         $projectsWithValues = $this->_retrieveProjectsValues($projects, $configs);
-        error_log("4");
         $this->view->data = [
             'projects' => $projects,
             'configs' => $configs,
             'projectsWithValues' => $projectsWithValues
         ];
-        error_log("5");
-        error_log(print_r($this->view->data, true));
     }
     private function _run() {
         try {
