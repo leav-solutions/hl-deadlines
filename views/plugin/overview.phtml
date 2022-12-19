@@ -87,7 +87,7 @@ $renderDeadline = function ($deadlineDate, $deadlineName, $projectName) {
   <meta name="author" content="HL REPRO">
   <meta http-equiv="refresh" content="<?= $autoRefresh ?>">
   <style type="text/css">
-html, body, #container {
+html, body {
   width: 100vw;
   height: 100vh;
   padding:0;
@@ -95,7 +95,8 @@ html, body, #container {
   font-family: Arial, Helvetica, sans-serif;
 }
 #container {
-  /*background: linear-gradient(0deg, #2f809d 0%, #3fa1c6 100%);*/
+  width: 100vw;
+  min-height: 100vh;
   background: linear-gradient(-45deg, #8CD523, #23a6d5);
 	background-size: 200% 200%;
 	animation: gradient 180s ease infinite;
@@ -135,7 +136,8 @@ html, body, #container {
   position:relative;
   display:flex;
   flex-direction: column;
-  gap: .5em; 
+  gap: .5em;
+  padding-bottom: .5em;
 }
 .group::before {
   content: "";
