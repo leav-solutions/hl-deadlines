@@ -202,11 +202,42 @@ html, body, #container {
 .project {
   font-style: italic;
 }
+#progress {
+  display:inline-block;
+  height:1em;
+  width: 10em;
+  border: 2px solid #ccc;
+  mix-blend-mode: soft-light;
+  position: relative;
+  vertical-align: text-bottom;
+}
+#progressbar {
+  position:relative;
+  box-sizing: border-box;
+  margin:1px;
+  height: calc(1em - 2px);
+  left: 0;
+  animation: progress 1800s linear;
+  background: #fff;
+}
+@keyframes progress {
+	0% {
+		width: 0%;
+	}
+	100% {
+		width: 100%;
+	}
+}
   </style>
 </head>
 <body>
 <div id="container">
-  <div class="header">Last update : <?= $this->lastUpdate ?></div>
+  <div class="header">
+    Last update : <?= $this->lastUpdate ?>
+    <div id="progress">
+      <div id="progressbar"></div>
+    </div>
+  </div>
   <div class="groups">
     <?php if(sizeof($deadlines['late']) >0): ?>
     <div class="group late">
