@@ -174,6 +174,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         $configsWithProjects = $this->_filterDeadlinesWithoutProject($configsWithProjects);
         $this->view->data = [
             'configsWithProjects' => $configsWithProjects,
+            'configs' => $configs,
             'projects' => $projects, 
             'projectsWithValues' => $projectsWithValues
         ];
