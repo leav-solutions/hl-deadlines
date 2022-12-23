@@ -173,7 +173,9 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         $configsWithProjects = $this->_groupProjectsByDeadline($projectsWithValues, $configs);
         $configsWithProjects = $this->_filterDeadlinesWithoutProject($configsWithProjects);
         $this->view->data = [
-            'configsWithProjects' => $configsWithProjects
+            'configsWithProjects' => $configsWithProjects,
+            'projects' => $projects, 
+            'projectsWithValues' => $projectsWithValues
         ];
     }
     private function _run() {
