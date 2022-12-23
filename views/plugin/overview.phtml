@@ -10,6 +10,9 @@ $deadlines = [
   'upcoming' => []
 ];
 
+$currentUserId = Kbx_Users::getCurrentUserId();
+$isLogged = $currentUserId > 0;
+
 foreach ($this->data['configsWithProjects'] as $config) {
   $configRecord = new Kbx_Records($config['id_record'], 110);
   $deadlineName = $configRecord->getLabel();
@@ -18,7 +21,9 @@ foreach ($this->data['configsWithProjects'] as $config) {
     $dealine = [
       'deadlineDate' => $project['triggerTimestamp'],
       'deadlineName' => $deadlineName,
-      'projectName' => $projectRecord->getLabel()
+      'projectName' => $projectRecord->getLabel(),
+      'projectId' => $project['id_record'],
+      'configId' => $config['id_record']
     ];
     if ($project['triggerTimestamp'] < $todayTimestamp) {
       $deadlines['late'][] = $dealine;
@@ -35,14 +40,18 @@ if ($this->fakeDatas === true) {
     $deadlines['late'][] = [
       'deadlineDate' => $todayTimestamp - ($i*86400),
       'deadlineName' => "Late deadline $i",
-      'projectName' => "Late project $i"
+      'projectName' => "Late project $i",
+      'projectId' => 0,
+      'configId' => 0
     ];
   }
   for ($i=1; $i<6; $i++) {
     $deadlines['today'][] = [
       'deadlineDate' => $todayTimestamp,
       'deadlineName' => "Today deadline $i",
-      'projectName' => "Today project $i"
+      'projectName' => "Today project $i",
+      'projectId' => 0,
+      'configId' => 0
     ];
   }
   $upcomingDeadlines = [];
@@ -50,7 +59,9 @@ if ($this->fakeDatas === true) {
     $deadlines['upcoming'][] = [
       'deadlineDate' => $todayTimestamp + (86400*round(rand(1,25))),
       'deadlineName' => "Upcoming deadline $i",
-      'projectName' => "Upcoming project $i"
+      'projectName' => "Upcoming project $i",
+      'projectId' => 0,
+      'configId' => 0
     ];
   }
 }
@@ -68,7 +79,7 @@ usort(
 );
 
 //id_attribute_triggerDate_timestamp
-$renderDeadline = function ($deadlineDate, $deadlineName, $projectName) {
+$renderDeadline = function ($deadlineDate, $deadlineName, $projectName, $projectId, $configId) use ($isLogged) {
   $dayNumber = date('d', $deadlineDate);
   $monthShort = date('M', $deadlineDate);
   echo "<div class=\"deadline\">
@@ -79,8 +90,11 @@ $renderDeadline = function ($deadlineDate, $deadlineName, $projectName) {
   <div class=\"texts\">
     <div class=\"title\">$deadlineName</div>
     <div class=\"project\">$projectName</div>
-  </div>
-</div>";
+  </div>";
+  if ($this->fakeDatas === true || ($isLogged && $projectId > 0 && $configId > 0)) {
+    echo "<a onClick=\"linkClicked(".$projectId.", ".$configId.");return false;\" title=\"Mark as done\" href=\"\" class=\"tick-mark\">&#10003;</a>";
+  }
+  echo "</div>";
 };
 ?>
 <!DOCTYPE html>
@@ -185,6 +199,9 @@ html, body {
   margin: 0 .5em;
   position:relative;
 }
+.deadline:hover {
+  background:rgba(255, 255, 255, 1);
+}
 .deadline .clear {
   clear: both;
 }
@@ -242,6 +259,27 @@ html, body {
 		width: 100%;
 	}
 }
+.tick-mark {
+    display: inline-block;
+    width: 3em;
+    height: 3em;
+    position: absolute;
+    top: .25em;
+    right: .25em;
+    background: #dff0f6;
+    color:#23a6d5;
+    text-decoration: none;
+    line-height:3em;
+    text-align:center;
+    opacity: .5;
+}
+.deadline:hover .tick-mark {
+  opacity: 1;
+}
+.tick-mark:hover {
+    background: #23a6d5;
+    color:#fff;
+}
   </style>
 </head>
 <body>
@@ -257,25 +295,31 @@ html, body {
     <div class="group late">
       <h3>LATE</h3>
       <?php foreach ($deadlines['late'] as $deadline) {
-        $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName']);
+        $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName'], $deadline['projectId'], $deadline['configId']);
       } ?>
     </div>
     <?php endif; ?>
     <div class="group today">
       <h3>TODAY</h3>
       <?php foreach ($deadlines['today'] as $deadline) {
-        $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName']);
+        $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName'], $deadline['projectId'], $deadline['configId']);
       } ?>
     </div>
     <div class="group upcoming">
       <h3>UPCOMING</h3>
       <?php foreach ($deadlines['upcoming'] as $deadline) {
-        $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName']);
+        $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName'], $deadline['projectId'], $deadline['configId']);
       } ?>
     </div>
   </div>
 </div>
 <script type="text/javascript">
+function linkClicked(idProject, idConfig) {
+  var url = window.location.href + '/markDone/execute' + '/idProject/' + (0 + Number(idProject)) + '/idConfig/' + (0 + Number(idConfig));
+  fetch(url).finally(function () {
+    window.location.reload();
+  });
+}
 
 
 </script>

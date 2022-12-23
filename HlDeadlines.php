@@ -164,6 +164,17 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             ? (int)$this->params['test']
             : 0;
 
+            if (isset($this->params['idProject']) && isset($this->params['idConfig']) && isset($this->params['markDone'])) {
+            $idProject = (int)$this->params['idProject'];
+            $idConfig = (int)$this->params['idConfig'];
+            $markDone = (string)$this->params['markDone'];
+            if ($markDone === 'execute' && $idProject > 0 && $idConfig > 0) {
+                $this->_markProjectDoneFromConfig($idProject, $idConfig);
+            }
+            $this->viewRenderer = false;
+            return;
+        }
+
         $this->view->fakeDatas = isset($this->params['fake']) && $this->params['fake'] == 1;
 
         $this->view->lastUpdate = date($this->_dateFormats[$this->_lang]['php'].' H:i:s', time());
@@ -466,5 +477,21 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         $config = Zend_Registry::getInstance()->configuration;
         $url = $config->public_host.'/plugin/index/plugin/HlDeadlines/execute/overview/key/'.self::$_overviewAccesKey;
         return $url;
+    }
+    private function _markProjectDoneFromConfig(int $idProject, int $idConfig): void {
+        if ($idProject === 0 || $idConfig === 0) {
+            return;
+        }
+        $currentUserId = Kbx_Users::getCurrentUserId();
+        if ($currentUserId === 0) {
+            return;
+        }
+
+        $idAttribute = (int)$this->_getValue($idConfig, self::$_configurationLibraryId, self::$_configurationDoneAttributeId);
+        if ($idAttribute === 0) {
+            return;
+        }
+        Kbx_Attributes::clearValues($idAttribute, $idProject, Kbx_Libraries::$projectsLibraryId);
+        Kbx_Attributes::saveValue(0, $idAttribute, $idProject, Kbx_Libraries::$projectsLibraryId, 1);
     }
 }
