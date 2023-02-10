@@ -33,11 +33,15 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     /**
      * @var int
      */
+    protected static $_configurationOnlyForCustomerAttributeId = 0;
+    /**
+     * @var int
+     */
     protected static $_configurationTestWorkflowId = 88;
     /**
      * @var array
      */
-    protected static $_projectsWorkflowIds = [43, 44, 39];
+    protected static $_projectsWorkflowIds = [43, 44, 39, 58, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98];
     /**
      * @var int
      */
@@ -77,6 +81,10 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
      * @var string
      */
     protected static $_overviewAccesKey = 'gb6nQxQ6Pa';
+    /**
+     * @var string
+     */
+    protected static $_overviewCustomerAccesKey = 'smiDf765jRdq';
     // phpcs:ignore Zend.NamingConventions.ValidVariableName
     /**
      * @var string
@@ -148,6 +156,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         $this->view->projectsTestStatusId = self::$_projectsWorkflowTestId;
         $this->view->projectsTestStatusLabel = Kbx_Roles::getTranslationLabel(self::$_projectsWorkflowTestId);
         $this->view->overviewUrl = $this->_getOverviewUrl();
+        $this->view->customerOverviewUrl = $this->_getCustomerOverviewUrl();
     }
     public function overview() {
         $this->layout = 'layout';
@@ -156,7 +165,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             ? $this->params['key']
             : '';
         
-        if ($accessKey != self::$_overviewAccesKey) {
+        if ($accessKey != self::$_overviewAccesKey && $accessKey != self::$_overviewCustomerAccesKey) {
             $this->viewRenderer = 'forbidden';
         }
 
@@ -164,7 +173,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             ? (int)$this->params['test']
             : 0;
 
-            if (isset($this->params['idProject']) && isset($this->params['idConfig']) && isset($this->params['markDone'])) {
+        if (isset($this->params['idProject']) && isset($this->params['idConfig']) && isset($this->params['markDone'])) {
             $idProject = (int)$this->params['idProject'];
             $idConfig = (int)$this->params['idConfig'];
             $markDone = (string)$this->params['markDone'];
@@ -175,11 +184,23 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             return;
         }
 
+        $onlyForCustomer = $accessKey == self::$_overviewCustomerAccesKey;
+
         $this->view->fakeDatas = isset($this->params['fake']) && $this->params['fake'] == 1;
 
         $this->view->lastUpdate = date($this->_dateFormats[$this->_lang]['php'].' H:i:s', time());
         $projects = $this->_getProjectsByStatus();
         $configs = $this->_getConfigurations();
+
+        if ($onlyForCustomer) {
+            $configs = array_filter(
+                $configs,
+                function ($c) {
+                    return $c['onlyForCustomer'] == 1;
+                }
+            );
+        }
+
         $projectsWithValues = $this->_retrieveProjectsValues($projects, $configs);
         $configsWithProjects = $this->_groupProjectsByDeadline($projectsWithValues, $configs);
         $configsWithProjects = $this->_filterDeadlinesWithoutProject($configsWithProjects);
@@ -230,11 +251,11 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     private function _getProjectsByStatus(): array {
         $db = Zend_Registry::getInstance()->dbAdapter;
         $select = $db->select()
-            ->from('k_record_4', ['id_record']);
+            ->from('k_record_4', ['id_record', 'lca_id']);
         if ($this->_test === 1) {
             $select->where('lca_id=?', self::$_projectsWorkflowTestId);
         } else {
-            $select->where('lca_id IN (?)', implode(',', self::$_projectsWorkflowIds));
+            $select->where('lca_id IN ('.implode(',', self::$_projectsWorkflowIds).')');
         }
             
         $res = $db->fetchAll($select);
@@ -249,7 +270,8 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                     'id_record',
                     'dateAttribute' => 'attribute_'.self::$_configurationDateAttributeId,
                     'doneAttribute' => 'attribute_'.self::$_configurationDoneAttributeId,
-                    'delay' => 'attribute_'.self::$_configurationDelayAttributeId
+                    'delay' => 'attribute_'.self::$_configurationDelayAttributeId,
+                    'onlyForCustomer' => 'attribute_'.self::$_configurationOnlyForCustomerAttributeId
                 ]
             )
             ->where('attribute_'.self::$_configurationDateAttributeId.' IS NOT NULL');
@@ -476,6 +498,11 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     private function _getOverviewUrl(): string {
         $config = Zend_Registry::getInstance()->configuration;
         $url = $config->public_host.'/plugin/index/plugin/HlDeadlines/execute/overview/key/'.self::$_overviewAccesKey;
+        return $url;
+    }
+    private function _getCustomerOverviewUrl(): string {
+        $config = Zend_Registry::getInstance()->configuration;
+        $url = $config->public_host.'/plugin/index/plugin/HlDeadlines/execute/overview/key/'.self::$_overviewCustomerAccesKey;
         return $url;
     }
     private function _markProjectDoneFromConfig(int $idProject, int $idConfig): void {
