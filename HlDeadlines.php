@@ -33,7 +33,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     /**
      * @var int
      */
-    protected static $_configurationOnlyForCustomerAttributeId = 1004;
+    protected static $_configurationShowInCustomerOverviewAttributeId = 1004;
     /**
      * @var int
      */
@@ -184,7 +184,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             return;
         }
 
-        $onlyForCustomer = $accessKey == self::$_overviewCustomerAccesKey;
+        $forCustomer = $accessKey == self::$_overviewCustomerAccesKey;
 
         $this->view->fakeDatas = isset($this->params['fake']) && $this->params['fake'] == 1;
 
@@ -192,11 +192,11 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         $projects = $this->_getProjectsByStatus();
         $configs = $this->_getConfigurations();
 
-        if ($onlyForCustomer) {
+        if ($forCustomer) {
             $configs = array_filter(
                 $configs,
                 function ($c) {
-                    return $c['onlyForCustomer'] == 1;
+                    return $c['showToCustomer'] == 1;
                 }
             );
         }
@@ -272,7 +272,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                     'dateAttribute' => 'attribute_'.self::$_configurationDateAttributeId,
                     'doneAttribute' => 'attribute_'.self::$_configurationDoneAttributeId,
                     'delay' => 'attribute_'.self::$_configurationDelayAttributeId,
-                    'onlyForCustomer' => 'attribute_'.self::$_configurationOnlyForCustomerAttributeId
+                    'showToCustomer' => 'attribute_'.self::$_configurationShowInCustomerOverviewAttributeId
                 ]
             )
             ->where('attribute_'.self::$_configurationDateAttributeId.' IS NOT NULL');
