@@ -33,7 +33,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
     /**
      * @var int
      */
-    protected static $_configurationOnlyForCustomerAttributeId = 0;
+    protected static $_configurationOnlyForCustomerAttributeId = 1004;
     /**
      * @var int
      */
