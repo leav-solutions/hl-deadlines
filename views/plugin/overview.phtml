@@ -293,20 +293,20 @@ html, body {
   <div class="groups">
     <?php if(sizeof($deadlines['late']) >0): ?>
     <div class="group late">
-      <h3>LATE</h3>
+      <h3>FOR SENT</h3>
       <?php foreach ($deadlines['late'] as $deadline) {
         $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName'], $deadline['projectId'], $deadline['configId']);
       } ?>
     </div>
     <?php endif; ?>
     <div class="group today">
-      <h3>TODAY</h3>
+      <h3>I DAG</h3>
       <?php foreach ($deadlines['today'] as $deadline) {
         $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName'], $deadline['projectId'], $deadline['configId']);
       } ?>
     </div>
     <div class="group upcoming">
-      <h3>UPCOMING</h3>
+      <h3>SNART</h3>
       <?php foreach ($deadlines['upcoming'] as $deadline) {
         $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName'], $deadline['projectId'], $deadline['configId']);
       } ?>
