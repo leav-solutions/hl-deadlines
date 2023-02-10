@@ -343,7 +343,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                         continue;
                     }
                     //if ($project['values'][(int)$config['dateAttribute'].'_timestamp'] <= $config['limitTimestamp']) {
-                    if ($todayTimeStamp >= $project['values'][(int)$config['dateAttribute'].'_triggerDate_timestamp']) {
+                    if ($project['values'][(int)$config['dateAttribute'].'_triggerDate_timestamp'] > 0 && $todayTimeStamp >= $project['values'][(int)$config['dateAttribute'].'_triggerDate_timestamp']) {
                         $config['matchingProjects'][] = [
                             'id_record' => $project['id_record'],
                             'timestamp' => $project['values'][(int)$config['dateAttribute'].'_timestamp'],
