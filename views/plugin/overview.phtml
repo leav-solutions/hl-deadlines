@@ -79,9 +79,14 @@ usort(
 );
 
 //id_attribute_triggerDate_timestamp
-$renderDeadline = function ($deadlineDate, $deadlineName, $projectName, $projectId, $configId) use ($isLogged) {
+$currentYear = date('y');
+$renderDeadline = function ($deadlineDate, $deadlineName, $projectName, $projectId, $configId) use ($isLogged, $currentYear) {
   $dayNumber = date('d', $deadlineDate);
   $monthShort = date('M', $deadlineDate);
+  $yearShort = date('y', $deadlineDate);
+  if ($yearShort != $currentYear) {
+    $monthShort .= " $yearShort";
+  }
   echo "<div class=\"deadline\">
   <div class=\"date\">
     <span class=\"day\">$dayNumber</span>
