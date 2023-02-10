@@ -217,6 +217,7 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             $configs = $this->_getConfigurations();
             $projectsWithValues = $this->_retrieveProjectsValues($projects, $configs);
             $configsWithProjects = $this->_groupProjectsByDeadline($projectsWithValues, $configs);
+            $configsWithProjects = $this->_filterDeadLinesProjectsBeforeTriggerDate($configsWithProjects);
             $configsWithProjects = $this->_filterDeadlinesWithoutProject($configsWithProjects);
             $configsWithProjectsAndNotifications = $this->_generateNotificationsTexts($configsWithProjects);
             $configsWithProjectsAndNotificationsAndRecipients = $this->_addRecipients($configsWithProjectsAndNotifications);
@@ -330,11 +331,11 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             : '';
     }
     private function _groupProjectsByDeadline(array $projectsWithValues, array $configs): array {
-        $today = new DateTime();
-        $today->setTime(0, 0, 0);;
-        $todayTimeStamp = $today->getTimestamp();
+        //$today = new DateTime();
+        //$today->setTime(0, 0, 0);;
+        //$todayTimeStamp = $today->getTimestamp();
         $configsWithProjects = array_map(
-            function ($config) use ($projectsWithValues, $todayTimeStamp) {
+            function ($config) use ($projectsWithValues) {
                 $config['matchingProjects'] = [];
                 foreach ($projectsWithValues as $project) {
                     // check the done value
@@ -343,8 +344,9 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                         continue;
                     }
                     //if ($project['values'][(int)$config['dateAttribute'].'_timestamp'] <= $config['limitTimestamp']) {
-                    if ($project['values'][(int)$config['dateAttribute'].'_triggerDate_timestamp'] > 0 && $todayTimeStamp >= $project['values'][(int)$config['dateAttribute'].'_triggerDate_timestamp']) {
-                        $config['matchingProjects'][] = [
+                    //if ($project['values'][(int)$config['dateAttribute'].'_triggerDate_timestamp'] > 0 && $todayTimeStamp >= $project['values'][(int)$config['dateAttribute'].'_triggerDate_timestamp']) {
+                    if ($project['values'][(int)$config['dateAttribute'].'_triggerDate_timestamp'] > 0) {
+                            $config['matchingProjects'][] = [
                             'id_record' => $project['id_record'],
                             'timestamp' => $project['values'][(int)$config['dateAttribute'].'_timestamp'],
                             'date' => $project['values'][(int)$config['dateAttribute']],
@@ -359,6 +361,20 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
             $configs
         );
         return $configsWithProjects;
+    }
+    private function _filterDeadLinesProjectsBeforeTriggerDate(array $configs): array {
+        $today = new DateTime();
+        $today->setTime(0, 0, 0);;
+        $todayTimeStamp = $today->getTimestamp();
+        foreach ($configs as $key => $config) {
+            $configs[$key]['matchingProjects'] = array_filter(
+                $config['matchingProjects'],
+                function ($project) use ($todayTimeStamp)  {
+                    return $todayTimeStamp >= $project['triggerTimestamp'];
+                }
+            );
+        } 
+        return $configs;
     }
     private function _filterDeadlinesWithoutProject(array $configs): array {
         return array_filter(
