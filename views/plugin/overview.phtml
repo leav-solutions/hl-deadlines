@@ -85,7 +85,7 @@ $renderDeadline = function ($deadlineDate, $deadlineName, $projectName, $project
   $monthShort = date('M', $deadlineDate);
   $yearShort = date('y', $deadlineDate);
   if ($yearShort != $currentYear) {
-    $monthShort .= " $yearShort";
+    $monthShort .= " '$yearShort";
   }
   echo "<div class=\"deadline\">
   <div class=\"date\">
@@ -211,9 +211,9 @@ html, body {
   clear: both;
 }
 .deadline .date { 
-  width: 3em;
+  width: 3.5em;
   height: 3em;
-  flex: 0 0 3em;
+  flex: 0 0 3.5em;
   background: var(--color);
   color: #fff;
   text-align:center;
