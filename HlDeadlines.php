@@ -308,13 +308,19 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                         (int)$config['doneAttribute'],
                         (int)$projectId
                     );
-                    $projectData['values'][(int)$config['dateAttribute'].'_timestamp'] = $this->_dateStringToTimestamp($projectData['values'][(int)$config['dateAttribute']]);
-                    $triggerDate = new DateTime();
-                    $triggerDate->setTimestamp($projectData['values'][(int)$config['dateAttribute'].'_timestamp']);
-                    $triggerDate->modify("$delayStr day");
-                    $triggerDate->setTime(0, 0, 0);
-                    $projectData['values'][(int)$config['dateAttribute'].'_triggerDate'] = date($this->_dateFormats[$this->_lang]['php'], $triggerDate->getTimestamp());
-                    $projectData['values'][(int)$config['dateAttribute'].'_triggerDate_timestamp'] = $triggerDate->getTimestamp();
+                    if ($projectData['values'][(int)$config['dateAttribute']] === '') {
+                        $projectData['values'][(int)$config['dateAttribute'].'_timestamp'] = 0;
+                        $projectData['values'][(int)$config['dateAttribute'].'_triggerDate'] = '';
+                        $projectData['values'][(int)$config['dateAttribute'].'_triggerDate_timestamp'] = 0;
+                    } else {
+                        $projectData['values'][(int)$config['dateAttribute'].'_timestamp'] = $this->_dateStringToTimestamp($projectData['values'][(int)$config['dateAttribute']]);
+                        $triggerDate = new DateTime();
+                        $triggerDate->setTimestamp($projectData['values'][(int)$config['dateAttribute'].'_timestamp']);
+                        $triggerDate->modify("$delayStr day");
+                        $triggerDate->setTime(0, 0, 0);
+                        $projectData['values'][(int)$config['dateAttribute'].'_triggerDate'] = date($this->_dateFormats[$this->_lang]['php'], $triggerDate->getTimestamp());
+                        $projectData['values'][(int)$config['dateAttribute'].'_triggerDate_timestamp'] = $triggerDate->getTimestamp();
+                    }
                 }
                 return $projectData;
             },
@@ -385,13 +391,14 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         );
     }
     private function _dateStringToTimestamp(string $dateStr): int {
+        if ($dateStr === '' ) {
+            return 0;
+        }
         if ((string)intval($dateStr) === $dateStr) {
             // we recieved a timestamp, no need to convert, but set to 00h:00m:00s
             $parsed = new DateTime();
             $parsed->setTimestamp($dateStr);
-
         } else {
-            
             $parsed = Kbx_Dates::date_create_from_format($this->_dateFormats[$this->_lang]['php'], $dateStr);
         }
         $parsed->setTime(0,0,0);
