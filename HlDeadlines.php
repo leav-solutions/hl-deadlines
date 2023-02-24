@@ -199,6 +199,13 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
                     return $c['showToCustomer'] == 1;
                 }
             );
+        } else {
+            $configs = array_filter(
+                $configs,
+                function ($c) {
+                    return $c['showToCustomer'] == 0;
+                }
+            );
         }
 
         $projectsWithValues = $this->_retrieveProjectsValues($projects, $configs);
