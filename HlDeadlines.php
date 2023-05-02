@@ -101,7 +101,10 @@ class Kbx_Plugins_HlDeadlines_HlDeadlines extends Kbx_Plugins_PluginBase {
         $this->viewRenderer = $params['execute'];
 
         $this->_dateFormats = Zend_Registry::getInstance()->dateFormats;
-        $this->_lang = Zend_Registry::getInstance()->Zend_Locale->getLanguage();
+        $this->_lang = "da";
+        $locale = new Zend_Locale();
+        $locale->setLocale($this->_lang);
+        Zend_Registry::getInstance()->Zend_Locale = $locale;
         $this->_test = 0;
 
     }
