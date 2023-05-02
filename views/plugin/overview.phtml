@@ -1,5 +1,5 @@
 <?php
-$autoRefresh = 1800;
+$autoRefresh = 60;
 $today = new DateTime();
 $today->setTime(0,0,0);
 $todayTimestamp = $today->getTimestamp();
@@ -302,7 +302,7 @@ html, body {
   <div class="groups">
     <?php if(sizeof($deadlines['late']) >0): ?>
     <div class="group late">
-      <h3>FOR SENT</h3>
+      <h3>OVERSKREDET</h3>
       <?php foreach ($deadlines['late'] as $deadline) {
         $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName'], $deadline['projectId'], $deadline['configId']);
       } ?>
@@ -315,7 +315,7 @@ html, body {
       } ?>
     </div>
     <div class="group upcoming">
-      <h3>SNART</h3>
+      <h3>KOMMENDE</h3>
       <?php foreach ($deadlines['upcoming'] as $deadline) {
         $renderDeadline($deadline['deadlineDate'], $deadline['deadlineName'], $deadline['projectName'], $deadline['projectId'], $deadline['configId']);
       } ?>
